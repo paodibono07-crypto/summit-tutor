@@ -219,7 +219,7 @@ input:disabled{{background:#f3f4f6}}
 .rb:hover{{background:#2a7db5}}
 </style></head><body>
 <div class="g">
-<div class="hdr">🏔️ SUMMIT MATH CHALLENGE 🏔️<br><span class="tp">__TOPIC_NAME__</span></div>
+<div class="hdr">__GAME_TITLE__<br><span class="tp">__TOPIC_NAME__</span></div>
 <div class="mtn">
   <div class="cr">
     <span class="ce">⛺</span><span class="cl" id="l0"></span>
@@ -238,23 +238,23 @@ input:disabled{{background:#f3f4f6}}
 <div class="st"><span id="sc">⭐ 0 / 5</span><span id="tm" class="tm">⏱️ 30s</span></div>
 <div id="qa">
   <div id="cpl" class="cl2"></div>
-  <div id="qel" class="qb">Loading…</div>
+  <div id="qel" class="qb">__LOADING_TXT__</div>
   <div class="ir">
-    <input type="text" id="ai" inputmode="decimal" placeholder="Answer…" autocomplete="off">
-    <button class="sb" id="sb">Submit ➤</button>
+    <input type="text" id="ai" inputmode="decimal" placeholder="__ANS_PLACEHOLDER__" autocomplete="off">
+    <button class="sb" id="sb">__SUBMIT_BTN__</button>
   </div>
   <div id="fb" class="fb"></div>
 </div>
 <div class="end" id="end">
-  <h2>🏔️ SUMMIT REACHED! 🏔️</h2>
+  <h2>__SUMMIT_REACHED__</h2>
   <p id="es"></p><p id="ev"></p>
-  <button class="rb" id="rb">🔄 Play Again</button>
+  <button class="rb" id="rb">__PLAY_AGAIN_BTN__</button>
 </div>
 </div>
 <script>
 const QS=__QUESTIONS_JSON__;
 const TOTAL=QS.length;
-const CPN=['⛺ Base Camp','🌲 Forest Trail','🪨 Rocky Ridge','❄️ Snow Zone','🦅 Peak','🏔️ SUMMIT'];
+const CPN=__CHECKPOINTS_JSON__;
 let qi=0,sc=0,tl=30,th=null,done=false,wrg=0;
 function pn(t){{t=(t+'').trim().replace(/,/g,'');if(t.includes('/')){{const[a,b]=t.split('/').map(Number);return isNaN(a)||isNaN(b)||!b?null:a/b;}}const n=parseFloat(t);return isNaN(n)?null:n;}}
 function neq(a,b){{const na=pn(''+a),nb=pn(''+b);return na!==null&&nb!==null&&Math.abs(na-nb)<0.01;}}
@@ -263,7 +263,7 @@ function updSc(){{document.getElementById('sc').textContent='⭐ '+sc+' / '+TOTA
 function mv(p){{for(let i=0;i<6;i++)document.getElementById('c'+i).textContent=i===p?'🧗':'';for(let i=0;i<5;i++)document.getElementById('l'+i).classList.toggle('lit',i<p);}}
 function tick(){{const e=document.getElementById('tm');e.textContent='⏱️ '+tl+'s';e.className='tm'+(tl<=8?' red':'');}}
 function startT(){{clearInterval(th);tl=30;tick();th=setInterval(()=>{{tl--;tick();if(tl<=0){{clearInterval(th);tout();}}}},1000);}}
-function tout(){{if(done)return;done=true;sfb('⏰ Time up! Answer: '+QS[qi].a,'to');lk();setTimeout(nxtQ,2200);}}
+function tout(){{if(done)return;done=true;sfb('__TIMEOUT_PRE__'+QS[qi].a,'to');lk();setTimeout(nxtQ,2200);}}
 function lk(){{document.getElementById('ai').disabled=true;document.getElementById('sb').disabled=true;}}
 function ulk(){{const i=document.getElementById('ai');i.value='';i.disabled=false;document.getElementById('sb').disabled=false;}}
 function showQ(){{done=false;wrg=0;document.getElementById('cpl').textContent=CPN[qi]+' — Q'+(qi+1)+'/'+TOTAL;document.getElementById('qel').textContent=QS[qi].q;ulk();sfb('');startT();setTimeout(()=>document.getElementById('ai').focus(),60);}}
@@ -271,16 +271,16 @@ function nxtQ(){{qi++;if(qi>=TOTAL){{endG();return;}}showQ();}}
 function sub(){{
   if(done)return;
   const raw=document.getElementById('ai').value.trim();if(!raw)return;
-  if(neq(raw,QS[qi].a)){{clearInterval(th);done=true;sc++;updSc();mv(Math.min(qi+1,5));sfb('✅ Correct! '+QS[qi].a+' — Great job! 🌟','ok');lk();setTimeout(nxtQ,1900);}}
+  if(neq(raw,QS[qi].a)){{clearInterval(th);done=true;sc++;updSc();mv(Math.min(qi+1,5));sfb('__CORRECT_PRE__'+QS[qi].a+'__CORRECT_POST__','ok');lk();setTimeout(nxtQ,1900);}}
   else{{wrg++;document.getElementById('ai').value='';setTimeout(()=>document.getElementById('ai').focus(),30);
-    if(wrg>=2){{done=true;clearInterval(th);sfb('❌ Answer: '+QS[qi].a+'. Keep going! 💪','no');lk();setTimeout(nxtQ,2200);}}
-    else sfb('❌ Not quite — try again! 💪','no');}}
+    if(wrg>=2){{done=true;clearInterval(th);sfb('__REVEALED_PRE__'+QS[qi].a+'__REVEALED_POST__','no');lk();setTimeout(nxtQ,2200);}}
+    else sfb('__WRONG_MSG__','no');}}
 }}
 function endG(){{
   clearInterval(th);document.getElementById('qa').style.display='none';
   const end=document.getElementById('end');end.style.display='block';
-  document.getElementById('es').textContent='Score: '+sc+'/'+TOTAL+' '+('⭐'.repeat(sc));
-  const vs=['🌱 Good try — keep practicing!','🌱 Nice start!','⛰️ Getting there!','🏔️ Great work!','🏔️ Excellent!','🏆 PERFECT!'];
+  document.getElementById('es').textContent='__SCORE_LBL__'+sc+'/'+TOTAL+' '+('⭐'.repeat(sc));
+  const vs=__VERDICTS_JSON__;
   document.getElementById('ev').textContent=vs[Math.min(sc,5)];
 }}
 function rst(){{qi=0;sc=0;done=false;wrg=0;updSc();mv(0);document.getElementById('qa').style.display='block';document.getElementById('end').style.display='none';showQ();}}
@@ -294,10 +294,63 @@ mv(0);showQ();
 def _build_inline_game(topic_name: str, lang: str = "en") -> str:
     """Return a gr.HTML value: a self-contained iframe embedding the full game."""
     questions = _py_game_questions(topic_name, lang)
+
+    if lang == "es":
+        ui = {
+            "game_title":    "🏔️ DESAFÍO MATEMÁTICO SUMMIT 🏔️",
+            "checkpoints":   ["⛺ Campamento Base", "🌲 Sendero del Bosque", "🪨 Cresta Rocosa", "❄️ Zona de Nieve", "🦅 La Cima", "🏔️ ¡CUMBRE!"],
+            "submit_btn":    "Enviar ➤",
+            "play_again":    "🔄 Jugar de nuevo",
+            "summit_reached":"🏔️ ¡CUMBRE ALCANZADA! 🏔️",
+            "verdicts":      ["🌱 ¡Buen intento — sigue practicando!", "🌱 ¡Buen comienzo!", "⛰️ ¡Vas bien!", "🏔️ ¡Buen trabajo!", "🏔️ ¡Excelente!", "🏆 ¡PERFECTO!"],
+            "correct_pre":   "✅ ¡Correcto! ",
+            "correct_post":  " — ¡Bien hecho! 🌟",
+            "wrong_msg":     "❌ ¡No es correcto — intenta de nuevo! 💪",
+            "revealed_pre":  "❌ Respuesta: ",
+            "revealed_post": ". ¡Sigue adelante! 💪",
+            "timeout_pre":   "⏰ ¡Tiempo! Respuesta: ",
+            "score_lbl":     "Puntaje: ",
+            "loading":       "Cargando…",
+            "ans_ph":        "Respuesta…",
+        }
+    else:
+        ui = {
+            "game_title":    "🏔️ SUMMIT MATH CHALLENGE 🏔️",
+            "checkpoints":   ["⛺ Base Camp", "🌲 Forest Trail", "🪨 Rocky Ridge", "❄️ Snow Zone", "🦅 Peak", "🏔️ SUMMIT"],
+            "submit_btn":    "Submit ➤",
+            "play_again":    "🔄 Play Again",
+            "summit_reached":"🏔️ SUMMIT REACHED! 🏔️",
+            "verdicts":      ["🌱 Good try — keep practicing!", "🌱 Nice start!", "⛰️ Getting there!", "🏔️ Great work!", "🏔️ Excellent!", "🏆 PERFECT!"],
+            "correct_pre":   "✅ Correct! ",
+            "correct_post":  " — Great job! 🌟",
+            "wrong_msg":     "❌ Not quite — try again! 💪",
+            "revealed_pre":  "❌ Answer: ",
+            "revealed_post": ". Keep going! 💪",
+            "timeout_pre":   "⏰ Time up! Answer: ",
+            "score_lbl":     "Score: ",
+            "loading":       "Loading…",
+            "ans_ph":        "Answer…",
+        }
+
     game_html = (
         _GAME_TEMPLATE
-        .replace("__TOPIC_NAME__", topic_name)
-        .replace("__QUESTIONS_JSON__", _json.dumps(questions))
+        .replace("__TOPIC_NAME__",      topic_name)
+        .replace("__QUESTIONS_JSON__",  _json.dumps(questions))
+        .replace("__GAME_TITLE__",      ui["game_title"])
+        .replace("__CHECKPOINTS_JSON__",_json.dumps(ui["checkpoints"]))
+        .replace("__SUBMIT_BTN__",      ui["submit_btn"])
+        .replace("__PLAY_AGAIN_BTN__",  ui["play_again"])
+        .replace("__SUMMIT_REACHED__",  ui["summit_reached"])
+        .replace("__VERDICTS_JSON__",   _json.dumps(ui["verdicts"]))
+        .replace("__CORRECT_PRE__",     ui["correct_pre"])
+        .replace("__CORRECT_POST__",    ui["correct_post"])
+        .replace("__WRONG_MSG__",       ui["wrong_msg"])
+        .replace("__REVEALED_PRE__",    ui["revealed_pre"])
+        .replace("__REVEALED_POST__",   ui["revealed_post"])
+        .replace("__TIMEOUT_PRE__",     ui["timeout_pre"])
+        .replace("__SCORE_LBL__",       ui["score_lbl"])
+        .replace("__LOADING_TXT__",     ui["loading"])
+        .replace("__ANS_PLACEHOLDER__", ui["ans_ph"])
     )
     escaped = _html.escape(game_html, quote=True)
     return (
@@ -342,10 +395,17 @@ def respond(
 
     # ── Exit command: typed during an active game or worksheet ───────────────────
     if session_active and _is_exit(message):
-        reply = (
-            "👋 No problem! You can start a new question anytime. "
-            "What math topic would you like to explore? 🏔️"
-        )
+        _es_exit = {"salir", "parar", "terminar", "detener", "salgo"}
+        if message.strip().lower() in _es_exit or detect_spanish(message):
+            reply = (
+                "👋 ¡Sin problema! Puedes hacer una nueva pregunta cuando quieras. "
+                "¿Qué tema de matemáticas quieres explorar? 🏔️"
+            )
+        else:
+            reply = (
+                "👋 No problem! You can start a new question anytime. "
+                "What math topic would you like to explore? 🏔️"
+            )
         worksheet_state = {}
         new_game_active = False
         panel_update = gr.update(value="")
