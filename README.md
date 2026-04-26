@@ -6,18 +6,7 @@ An AI-powered math tutor for 1st and 2nd grade students at Summit Math Camp in T
 
 ## What it Does
 
-Summit Tutor combines a conversational AI with a retrieval-augmented generation (RAG) pipeline to give 1st and 2nd grade students at Summit Math Camp in Tegucigalpa, Honduras accurate, curriculum-aligned answers:
-
-- **Bilingual support** — detects English or Spanish and responds in kind
-- **Step-by-step reasoning** — chain-of-thought prompting ensures the tutor always shows its work
-- **RAG pipeline** — retrieves relevant passages from uploaded course notes (PDF) before answering, so responses stay grounded in the student's actual curriculum
-- **Interactive math game** — an inline HTML5 mountain-climbing game generates 5 topic-matched questions; the climber advances up the mountain with each correct answer
-- **Adaptive worksheet generator** — presents 8 problems one at a time, gives a hint on the first wrong attempt, reveals the answer with explanation on the second, and shows a final score summary; answers are verified with Python arithmetic (not Claude), eliminating hallucinated grading
-- **Image upload** — students can photograph a handwritten math problem; Claude analyzes the image, identifies the topic, and explains the solution step by step
-- **Guardrails** — off-topic questions (politics, entertainment, food, etc.) are politely declined; all math questions, including simple arithmetic like "what is 2+5?", are allowed through
-- **Rate limiting** — per-user rolling window (20 requests / 60 s) prevents abuse
-- **Interaction logging** — every exchange is logged to `logs.jsonl` for later review
-- **Prompt experiments** — three system-prompt variants (zero-shot, few-shot, chain-of-thought) were tested and compared; see the Evaluation section
+Summit Tutor combines a conversational AI with a retrieval-augmented generation (RAG) pipeline to give 1st and 2nd grade students at Summit Math Camp in Tegucigalpa, Honduras accurate, curriculum-aligned answers. The app detects whether the student is writing in English or Spanish and responds in kind, and chain-of-thought prompting ensures the tutor always shows its work step by step. Before each response, the RAG pipeline retrieves relevant passages from uploaded course-note PDFs so answers stay grounded in the student's actual curriculum. Students can also photograph a handwritten math problem and upload it; Claude analyzes the image, identifies the topic, and explains the solution step by step. When a student wants extra practice, an inline HTML5 mountain-climbing game generates five topic-matched questions and advances a climber up the mountain with each correct answer. An adaptive worksheet generator presents eight problems one at a time, gives a hint on the first wrong attempt, reveals the correct answer with an explanation on the second, and shows a final score summary; answers are verified with Python arithmetic rather than Claude, eliminating hallucinated grading. Off-topic questions about politics, entertainment, food, and similar subjects are politely declined, while all math questions including simple arithmetic like "what is 2+5?" are allowed through. A per-user rolling window of 20 requests per 60 seconds prevents abuse, and every exchange is logged to `logs.jsonl` for later review. Three system-prompt variants — zero-shot, few-shot, and chain-of-thought — were tested and compared; see the Evaluation section for results.
 
 ---
 
