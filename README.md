@@ -1,5 +1,7 @@
 # Summit Tutor
 
+**Project Goal:** Build an AI-powered bilingual math tutoring assistant that helps 1st and 2nd grade Summit Math Camp students and their parents practice math through personalized explanations, interactive games, and adaptive worksheets grounded in real Summit Math Camp curriculum materials.
+
 An AI-powered math tutor for 1st and 2nd grade students at Summit Math Camp in Tegucigalpa, Honduras, built with the Claude API and Gradio. Students can ask questions in **English or Spanish** and receive step-by-step explanations across arithmetic, fractions, basic algebra, and geometry.
 
 ---
