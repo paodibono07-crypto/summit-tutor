@@ -59,6 +59,18 @@ For full setup details, see [SETUP.md](SETUP.md).
 
 ---
 
+## Project Progression
+
+**Problem:** Math education access in Central America is limited, and Summit Math Camp families need a way to continue practicing at home without a teacher present.
+
+**Approach:** Build a bilingual AI tutor using RAG to ground responses in real Summit curriculum materials, with chain-of-thought prompting for pedagogical quality.
+
+**Solution:** Summit Tutor - a Gradio web app combining the Claude API, LangChain FAISS retrieval over 14 Summit PDFs, interactive math games, adaptive worksheets with answer checking, and image upload to analyze handwritten problems.
+
+**Evaluation:** Tested across 15 questions achieving 93% guardrail accuracy, 5.59s average latency, and qualitative prompt comparison showing chain-of-thought produces 2x more detailed explanations than zero-shot.
+
+---
+
 ## Evaluation
 
 ### Guardrail & response quality
