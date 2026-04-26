@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp /mnt/user-data/uploads/Subtraction_with_Regrouping_game_-_Google_Slides.pdf /Users/paoladibono/summit-tutor/docs/)",
+      "Bash(cp /mnt/user-data/uploads/Intro_to_fractions__ppt_-_Google_Slides.pdf /Users/paoladibono/summit-tutor/docs/)",
+      "Skill(claude-api)",
+      "Bash(python *)",
+      "Bash(jobs -l)",
+      "Bash(python app.py)",
+      "Bash(echo \"PID: $!\")",
+      "Read(//tmp/**)",
+      "Bash(curl -s http://127.0.0.1:7860)",
+      "Bash(curl -s http://127.0.0.1:7861)",
+      "Bash(curl -s http://127.0.0.1:7862)",
+      "Bash(pkill -f \"python app.py\")",
+      "Bash(curl -s http://localhost:8765/game.html)",
+      "Bash(grep -n \"^    return reply, history$\\\\|^# ── Pure-Python\" /Users/paoladibono/summit-tutor/chat.py)",
+      "Bash(curl -s http://localhost:7860)"
+    ]
+  }
+}

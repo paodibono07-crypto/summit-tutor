@@ -1,0 +1,324 @@
+prompt_type,question,response,response_length_chars,latency_seconds
+zero_shot,What is 2 + 5?,"Great question! Let's solve it step by step.
+
+**2 + 5 = 7**
+
+When you add 2 and 5 together, you're combining them. Think of it like this: if you have 2 apples 🍎🍎 and someone gives you 5 more apples 🍎🍎🍎🍎🍎, you now have **7 apples** in total!
+
+Do you have another math problem you'd like help with? 😊",298,3.208
+zero_shot,Solve for x: 3x + 5 = 20,"# Solving 3x + 5 = 20
+
+Let's solve this step by step! 🎯
+
+**Step 1: Subtract 5 from both sides**
+
+We want to get the ""3x"" by itself, so we need to get rid of the +5.
+
+$$3x + 5 - 5 = 20 - 5$$
+
+$$3x = 15$$
+
+**Step 2: Divide both sides by 3**
+
+Now we need to get ""x"" alone, so we divide by 3.
+
+$$\frac{3x}{3} = \frac{15}{3}$$
+
+$$x = 5$$
+
+**Answer: x = 5** ✅
+
+**Let's check our work!** Plug x = 5 back into the original equation:
+- 3(5) + 5 = 15 + 5 = 20 ✔️
+
+It works! Do you want to try another one? 😊",497,5.012
+zero_shot,What is 1/3 + 1/4?,"Great question! Let's add these fractions step by step. 😊
+
+**Problem:** 1/3 + 1/4
+
+### Step 1: Find a common denominator
+The denominators are **3** and **4**. We need a number that both 3 and 4 divide into evenly.
+
+The least common denominator (LCD) is **12** (because 3 × 4 = 12).
+
+### Step 2: Rewrite each fraction with denominator 12
+
+- **1/3** → multiply top and bottom by 4:
+  $$\frac{1 \times 4}{3 \times 4} = \frac{4}{12}$$
+
+- **1/4** → multiply top and bottom by 3:
+  $$\frac{1 \times 3}{4 \times 3} = \frac{3}{12}$$
+
+### Step 3: Add the fractions
+Now that the denominators are the same, just add the numerators:
+
+$$\frac{4}{12} + \frac{3}{12} = \frac{7}{12}$$
+
+### Step 4: Simplify (if possible)
+7 and 12 share no common factors, so **7/12** is already in simplest form. ✅
+
+### ✨ Final Answer: **7/12**
+
+Would you like to try another one, or want me to explain any step more? 🎓",886,5.898
+zero_shot,What is 25% of 80?,"# Finding 25% of 80
+
+**Step 1: Convert the percent to a decimal**
+
+25% = 0.25
+
+**Step 2: Multiply**
+
+0.25 × 80 = **20**
+
+## Answer: 25% of 80 is **20** ✅
+
+### 💡 Quick Tip
+25% is the same as ¼ (one-fourth). So another way to solve this is:
+
+$$80 \div 4 = 20$$
+
+Both methods give you the same answer! Would you like to try another percent problem? 😊",347,4.316
+zero_shot,What is the area of a triangle with base 6 and height 4?,"# Finding the Area of a Triangle
+
+**Formula:** Area = ½ × base × height
+
+**Given:**
+- Base = 6
+- Height = 4
+
+**Step-by-step:**
+
+Step 1: Write the formula.
+$$A = \frac{1}{2} \times b \times h$$
+
+Step 2: Plug in the values.
+$$A = \frac{1}{2} \times 6 \times 4$$
+
+Step 3: Multiply.
+$$A = \frac{1}{2} \times 24 = 12$$
+
+**Answer:** The area is **12 square units**. ✅
+
+Would you like to try another one? 😊",399,2.955
+few_shot,What is 2 + 5?,"2 + 5 = 7 ✓
+
+Need help with anything else in math? 😊",52,1.465
+few_shot,Solve for x: 3x + 5 = 20,"Great problem! Let's solve it step by step. My goal is to get x by itself.
+
+Step 1 — Subtract 5 from both sides:
+3x + 5 − 5 = 20 − 5
+3x = 15
+
+Step 2 — Divide both sides by 3:
+3x ÷ 3 = 15 ÷ 3
+x = 5
+
+Check: 3(5) + 5 = 15 + 5 = 20 ✓
+
+So **x = 5**. Nice work! 🎉",257,2.8
+few_shot,What is 1/3 + 1/4?,"Nice fraction problem! To add fractions, I need a common denominator.
+
+Step 1 — Find the LCD of 3 and 4: it's 12.
+
+Step 2 — Convert each fraction:
+- 1/3 = 4/12 (multiply top and bottom by 4)
+- 1/4 = 3/12 (multiply top and bottom by 3)
+
+Step 3 — Add the numerators: 4/12 + 3/12 = 7/12.
+
+Step 4 — Check if it simplifies: 7 and 12 share no common factors, so 7/12 is already in simplest form.
+
+Answer: **7/12** ✓",409,3.274
+few_shot,What is 25% of 80?,"Great question! Let me show you two ways to solve this.
+
+**Method 1 — Convert the percent to a decimal:**
+Step 1 — 25% = 0.25
+Step 2 — Multiply: 0.25 × 80 = 20
+
+**Method 2 — Use a fraction:**
+Step 1 — 25% = 1/4
+Step 2 — Divide: 80 ÷ 4 = 20
+
+**Answer: 25% of 80 is 20.** ✓
+
+Both methods work — use whichever one feels easier for you!",332,3.075
+few_shot,What is the area of a triangle with base 6 and height 4?,"Great question! To find the area of a triangle, I use this formula:
+
+**Area = (1/2) × base × height**
+
+Step 1 — Plug in the values: Area = (1/2) × 6 × 4
+
+Step 2 — Multiply: (1/2) × 6 = 3
+
+Step 3 — Multiply again: 3 × 4 = 12
+
+**The area is 12 square units.** ✓
+
+Tip: Don't forget that area is always measured in *square* units (like cm², in², etc.)!",348,3.477
+chain_of_thought,What is 2 + 5?,"Great question! Let's solve it step by step. 😊
+
+**Step 1: Identify the type of problem**
+This is a basic **addition** problem in arithmetic.
+
+**Step 2: Key concept**
+Addition means combining two numbers to find the total.
+
+**Step 3: Solve it step by step**
+We need to add 2 and 5.
+
+- Start with 2.
+- Count up 5 more: 3, 4, 5, 6, 7.
+
+So, 2 + 5 = **7**.
+
+**Step 4: Verify the answer**
+Let's check by flipping the numbers (addition works in any order):
+5 + 2 → start with 5, count up 2: 6, 7. ✅
+
+**Final Answer: 2 + 5 = 7**
+
+Do you want to try another one? 🎉",555,4.407
+chain_of_thought,Solve for x: 3x + 5 = 20,"# Solving 3x + 5 = 20
+
+Let me work through this step by step! 🧮
+
+**Step 1: Identify the type of problem**
+This is a **linear equation** with one variable (x). Our goal is to get x by itself on one side.
+
+**Step 2: Key concept**
+To solve, we use **inverse operations** to ""undo"" what's being done to x. Whatever we do to one side, we must do to the other side to keep the equation balanced.
+
+**Step 3: Solve step by step**
+
+Starting equation:
+$$3x + 5 = 20$$
+
+**Step 3a:** Subtract 5 from both sides (to undo the +5):
+$$3x + 5 - 5 = 20 - 5$$
+$$3x = 15$$
+
+**Step 3b:** Divide both sides by 3 (to undo multiplication by 3):
+$$\frac{3x}{3} = \frac{15}{3}$$
+$$x = 5$$
+
+**Step 4: Verify the answer**
+Let's plug x = 5 back into the original equation:
+$$3(5) + 5 = 20$$
+$$15 + 5 = 20$$
+$$20 = 20 ✓$$
+
+**✅ Final Answer: x = 5**
+
+Would you like to try another equation like this one? 😊",875,6.162
+chain_of_thought,What is 1/3 + 1/4?,"# Adding 1/3 + 1/4
+
+Let me walk you through this step by step! 😊
+
+### Step 1: Identify the type of problem
+This is a **fraction addition** problem with **unlike denominators** (different bottom numbers: 3 and 4).
+
+### Step 2: Key concept
+To add fractions, the denominators **must be the same**. We need to find a **common denominator** by finding the Least Common Multiple (LCM) of 3 and 4.
+
+### Step 3: Find the common denominator
+- Multiples of 3: 3, 6, 9, **12**, 15...
+- Multiples of 4: 4, 8, **12**, 16...
+- **LCM = 12** ✅
+
+### Step 4: Convert each fraction to have denominator 12
+
+**For 1/3:** Multiply top and bottom by 4
+$$\frac{1}{3} = \frac{1 \times 4}{3 \times 4} = \frac{4}{12}$$
+
+**For 1/4:** Multiply top and bottom by 3
+$$\frac{1}{4} = \frac{1 \times 3}{4 \times 3} = \frac{3}{12}$$
+
+### Step 5: Add the numerators (keep denominator the same)
+$$\frac{4}{12} + \frac{3}{12} = \frac{4 + 3}{12} = \frac{7}{12}$$
+
+### Step 6: Simplify (if possible)
+Can 7/12 be simplified? The factors of 7 are only 1 and 7. Since 12 is not divisible by 7, the fraction is **already in simplest form**. ✅
+
+### Step 7: Verify with decimals
+- 1/3 ≈ 0.333...
+- 1/4 = 0.25
+- Sum ≈ 0.583...
+- Check: 7 ÷ 12 ≈ 0.583... ✅ It matches!
+
+## ✨ Final Answer:
+$$\frac{1}{3} + \frac{1}{4} = \frac{7}{12}$$
+
+Would you like to try another fraction problem? 🧮",1336,8.071
+chain_of_thought,What is 25% of 80?,"# Finding 25% of 80
+
+**Step 1: Identify the type of problem**
+This is a **percentage problem**. We need to find a part of a whole number.
+
+**Step 2: Key concept**
+""Percent"" means ""out of 100."" To find a percent of a number, we can:
+- Convert the percent to a decimal (divide by 100), OR
+- Convert the percent to a fraction
+
+The formula is:
+$$\text{Part} = \text{Percent} \times \text{Whole}$$
+
+**Step 3: Solve step by step**
+
+**Method 1 — Using a decimal:**
+1. Convert 25% to a decimal:
+$$25\% = \frac{25}{100} = 0.25$$
+
+2. Multiply by 80:
+$$0.25 \times 80 = 20$$
+
+**Method 2 — Using a fraction (to double-check):**
+1. 25% is the same as $\frac{1}{4}$ (because $\frac{25}{100} = \frac{1}{4}$).
+2. Divide 80 by 4:
+$$80 \div 4 = 20$$
+
+**Step 4: Verify the answer** ✅
+Let's check: if 20 is 25% of 80, then 4 × 20 should equal 80.
+$$4 \times 20 = 80 \checkmark$$
+
+## ✨ Final Answer: **25% of 80 is 20**
+
+💡 *Quick tip:* Anytime you see **25%**, you can just divide the number by **4** — it's a shortcut that saves time!
+
+Do you want to try another percentage problem? 😊",1064,7.532
+chain_of_thought,What is the area of a triangle with base 6 and height 4?,"Great question! Let's solve this step by step. 📐
+
+## Step 1: Identify the type of problem
+This is a **geometry** problem about finding the **area of a triangle**.
+
+## Step 2: Recall the formula
+The formula for the area of a triangle is:
+
+$$\text{Area} = \frac{1}{2} \times \text{base} \times \text{height}$$
+
+## Step 3: Write down what we know
+- Base = 6
+- Height = 4
+
+## Step 4: Plug the values into the formula
+
+$$\text{Area} = \frac{1}{2} \times 6 \times 4$$
+
+## Step 5: Do the calculations one at a time
+
+First, multiply the base and height:
+$$6 \times 4 = 24$$
+
+Then, multiply by ½ (which is the same as dividing by 2):
+$$\frac{1}{2} \times 24 = 12$$
+
+## Step 6: Verify the answer
+Let's check by multiplying in a different order:
+- Half of the base first: ½ × 6 = 3
+- Then multiply by the height: 3 × 4 = 12 ✅
+
+Same answer — so we know it's correct!
+
+## ✅ Final Answer
+The area of the triangle is **12 square units**.
+
+Would you like to try another problem, maybe with different numbers? 😊",994,5.939

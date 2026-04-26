@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🏔️ Summit Mountain Climber</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(180deg, #0d1b2a 0%, #1a3a5c 35%, #4a90d9 70%, #87ceeb 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff;
+  user-select: none;
+}
+
+h1 {
+  margin: 14px 0 2px;
+  font-size: 1.9em;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
+  letter-spacing: 0.02em;
+}
+
+#topic-label {
+  font-size: 0.95em;
+  opacity: 0.75;
+  margin-bottom: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+canvas {
+  display: block;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  max-width: 100%;
+}
+
+/* ── UI panel ────────────────────────────────────────────────── */
+#ui-panel {
+  background: rgba(255,255,255,0.96);
+  border-radius: 18px;
+  padding: 18px 28px 20px;
+  margin: 14px auto 20px;
+  max-width: 680px;
+  width: 95%;
+  color: #0a1f44;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+}
+
+#status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 700;
+  font-size: 1.05em;
+}
+
+#timer {
+  background: #1a56db;
+  color: #fff;
+  padding: 5px 16px;
+  border-radius: 20px;
+  min-width: 72px;
+  text-align: center;
+  transition: background 0.3s;
+}
+#timer.urgent { background: #dc2626; animation: pulse 0.7s ease-in-out infinite alternate; }
+@keyframes pulse { from { opacity: 1; } to { opacity: 0.65; } }
+
+#checkpoint-label {
+  font-size: 0.85em;
+  color: #3b9edd;
+  font-weight: 600;
+  margin-bottom: 8px;
+  min-height: 1.2em;
+}
+
+#question-text {
+  font-size: 1.55em;
+  font-weight: 800;
+  color: #0a1f44;
+  margin: 10px 0 14px;
+  min-height: 2.2em;
+  line-height: 1.35;
+}
+
+#input-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+#answer-input {
+  font-size: 1.3em;
+  padding: 9px 16px;
+  border: 2.5px solid #1a56db;
+  border-radius: 10px;
+  width: 170px;
+  text-align: center;
+  color: #0a1f44;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+#answer-input:focus {
+  border-color: #3b9edd;
+  box-shadow: 0 0 0 3px rgba(59,158,221,0.28);
+}
+#answer-input:disabled { background: #f0f4fa; }
+
+#submit-btn {
+  font-size: 1.1em;
+  padding: 9px 24px;
+  background: #1a56db;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background 0.2s, transform 0.1s;
+}
+#submit-btn:hover:not(:disabled) { background: #0a1f44; transform: translateY(-1px); }
+#submit-btn:disabled { background: #9ca3af; cursor: default; transform: none; }
+
+#feedback {
+  font-size: 1.15em;
+  font-weight: 700;
+  min-height: 1.6em;
+  transition: all 0.25s;
+}
+#feedback.correct { color: #16a34a; }
+#feedback.wrong   { color: #dc2626; }
+#feedback.timeout { color: #d97706; }
+
+/* ── Celebration overlay ─────────────────────────────────────── */
+#celebration {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(5,10,25,0.82);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+#celebration.show { display: flex; }
+
+#cel-card {
+  background: linear-gradient(135deg, #1a3a6c 0%, #0a1f44 100%);
+  border: 2px solid #3b9edd;
+  border-radius: 24px;
+  padding: 42px 56px;
+  text-align: center;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+  animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  max-width: 480px;
+  width: 92%;
+}
+@keyframes popIn {
+  from { transform: scale(0.45); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+#cel-card h2       { font-size: 2.3em; margin-bottom: 12px; line-height: 1.2; }
+#cel-score         { font-size: 1.45em; margin: 10px 0 6px; font-weight: 700; }
+#cel-verdict       { font-size: 1.05em; opacity: 0.88; margin-bottom: 22px; }
+#play-again-btn {
+  padding: 12px 36px;
+  font-size: 1.1em;
+  background: #3b9edd;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background 0.2s;
+}
+#play-again-btn:hover { background: #2a7db5; }
+
+/* ── Confetti canvas lives at document root, injected by JS ── */
+</style>
+</head>
+<body>
+
+<h1>🏔️ Summit Mountain Climber</h1>
+<div id="topic-label">Loading…</div>
+
+<canvas id="canvas" width="700" height="400"></canvas>
+
+<div id="ui-panel">
+  <div id="status-row">
+    <div id="score-display">⭐ Score: 0 / 5</div>
+    <div id="timer">⏱️ 30s</div>
+  </div>
+  <div id="checkpoint-label"></div>
+  <div id="question-text">Get ready to climb! 🧗</div>
+  <div id="input-row">
+    <input id="answer-input" type="text" inputmode="numeric" placeholder="Your answer…" autocomplete="off">
+    <button id="submit-btn">Submit ➤</button>
+  </div>
+  <div id="feedback"></div>
+</div>
+
+<div id="celebration">
+  <div id="cel-card">
+    <h2>🏔️ SUMMIT<br>REACHED! 🏔️</h2>
+    <div id="cel-score"></div>
+    <div id="cel-verdict"></div>
+    <button id="play-again-btn" onclick="resetGame()">🔄 Play Again</button>
+  </div>
+</div>
+
+<script>
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+function parseAnswer(text) {
+  text = (text + '').trim().replace(/,/g, '');
+  if (text.includes('/')) {
+    const [n, d] = text.split('/').map(Number);
+    return (!isNaN(n) && !isNaN(d) && d !== 0) ? n / d : null;
+  }
+  const n = parseFloat(text);
+  return isNaN(n) ? null : n;
+}
+
+function numEqual(a, b) {
+  const na = parseAnswer(String(a)), nb = parseAnswer(String(b));
+  return na !== null && nb !== null && Math.abs(na - nb) < 0.01;
+}
+
+// ── Topic setup ───────────────────────────────────────────────────────────────
+
+const urlParams   = new URLSearchParams(window.location.search);
+const rawTopic    = urlParams.get('topic') || 'addition';
+
+// Map human-readable names AND resource keys → generator key
+const TOPIC_ALIAS = {
+  'addition':                      'addition',
+  'Addition':                      'addition',
+  'addition_word_problems':        'word_problems',
+  'Addition Word Problems':        'word_problems',
+  'subtraction_regrouping':        'subtraction',
+  'Subtraction with Regrouping':   'subtraction',
+  'multiplication':                'multiplication',
+  'Multiplication & Equal Groups': 'multiplication',
+  'division':                      'division',
+  'Division':                      'division',
+  'fractions_intro':               'fractions',
+  'Introduction to Fractions':     'fractions',
+  'equivalent_fractions':          'equiv_fractions',
+  'Equivalent Fractions':          'equiv_fractions',
+  'telling_time':                  'time',
+  'Telling Time':                  'time',
+};
+const topicKey = TOPIC_ALIAS[rawTopic] || 'addition';
+
+const TOPIC_NAMES = {
+  addition:      'Addition',
+  word_problems: 'Addition Word Problems',
+  subtraction:   'Subtraction with Regrouping',
+  multiplication:'Multiplication',
+  division:      'Division',
+  fractions:     'Introduction to Fractions',
+  equiv_fractions:'Equivalent Fractions',
+  time:          'Telling Time',
+};
+document.getElementById('topic-label').textContent = 'Topic: ' + (TOPIC_NAMES[topicKey] || rawTopic);
+
+// ── Problem generators ────────────────────────────────────────────────────────
+
+const GENERATORS = {
+  addition: () => {
+    const a = rand(11, 79), b = rand(11, 79);
+    return { q: `${a} + ${b} = ?`, a: a + b };
+  },
+  word_problems: () => {
+    const a = rand(5, 30), b = rand(5, 30);
+    const stems = [
+      `There are ${a} students at Base Camp and ${b} more arrive. How many total?`,
+      `María has ${a} trail snacks. She packs ${b} more. How many does she have?`,
+      `The summit hut has ${a} hikers. ${b} more hike up. How many hikers now?`,
+      `Carlos climbed ${a} meters in the morning and ${b} in the afternoon. Total meters?`,
+    ];
+    return { q: stems[rand(0, stems.length - 1)], a: a + b };
+  },
+  subtraction: () => {
+    // Guarantee regrouping: ones digit of minuend < ones digit of subtrahend
+    let a, b;
+    do {
+      b = rand(19, 79);
+      a = b + rand(5, 30);
+    } while ((a % 10) >= (b % 10));
+    return { q: `${a} − ${b} = ?`, a: a - b };
+  },
+  multiplication: () => {
+    const a = rand(2, 12), b = rand(2, 12);
+    return { q: `${a} × ${b} = ?`, a: a * b };
+  },
+  division: () => {
+    const b = rand(2, 9), q = rand(2, 9);
+    return { q: `${b * q} ÷ ${b} = ?`, a: q };
+  },
+  fractions: () => {
+    const d  = [2, 4, 6, 8][rand(0, 3)];
+    const n1 = rand(1, d - 1), n2 = rand(1, d - n1);
+    return { q: `${n1}/${d} + ${n2}/${d} = ?/${d}  (find the numerator)`, a: n1 + n2 };
+  },
+  equiv_fractions: () => {
+    const n = rand(1, 4), d = rand(2, 6), mult = rand(2, 4);
+    return { q: `${n}/${d} = ?/${d * mult}  (find the missing numerator)`, a: n * mult };
+  },
+  time: () => {
+    const h = rand(1, 12);
+    const mOpts = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
+    const m = mOpts[rand(0, mOpts.length - 1)];
+    const pad = m.toString().padStart(2, '0');
+    return { q: `A clock shows ${h}:${pad}. How many minutes past the hour?`, a: m };
+  },
+};
+
+function makeQuestion() {
+  const gen = GENERATORS[topicKey] || GENERATORS.addition;
+  return gen();
+}
+
+// ── Canvas / mountain drawing ─────────────────────────────────────────────────
+
+const canvas = document.getElementById('canvas');
+const ctx    = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+// Climbing path: 6 waypoints (index 0 = base, 5 = summit)
+const PATH = [
+  { x: 148, y: H - 52 },   // 0  base
+  { x: 210, y: 295 },      // 1  forest trail
+  { x: 268, y: 218 },      // 2  rocky ridge
+  { x: 316, y: 156 },      // 3  snow zone
+  { x: 352, y: 105 },      // 4  peak approach
+  { x: 378, y:  64 },      // 5  summit
+];
+
+const CP_NAMES = ['⛺ Base Camp','🌲 Forest Trail','🪨 Rocky Ridge','❄️ Snow Zone','🦅 Peak','🏔️ SUMMIT'];
+
+// Fixed star positions (deterministic so they don't flicker)
+const STARS = [[60,22],[110,12],[195,34],[44,55],[580,18],[628,42],[675,15],[714,40],[638,8],[554,30],[340,12],[430,20]];
+
+// Fixed tree positions on the right slope
+const TREES = [[490,318],[535,298],[562,328],[595,308],[618,338],[505,350],[548,355],[580,340]];
+
+let climberPos  = 0;          // current waypoint index (integer, 0-5)
+let animX = PATH[0].x;
+let animY = PATH[0].y;
+let animTargetIdx = 0;
+
+function drawScene() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Sky gradient
+  const sky = ctx.createLinearGradient(0, 0, 0, H);
+  sky.addColorStop(0,    '#0d1b2a');
+  sky.addColorStop(0.35, '#1a3a5c');
+  sky.addColorStop(0.68, '#4a90d9');
+  sky.addColorStop(1,    '#87ceeb');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, W, H);
+
+  // Stars
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  STARS.forEach(([sx, sy]) => {
+    ctx.beginPath();
+    ctx.arc(sx, sy, 1.6, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Mountain body
+  ctx.beginPath();
+  ctx.moveTo(378, 58);
+  ctx.lineTo(55, H - 22);
+  ctx.lineTo(645, H - 22);
+  ctx.closePath();
+  const mGrad = ctx.createLinearGradient(378, 58, 378, H);
+  mGrad.addColorStop(0,    '#4a5568');
+  mGrad.addColorStop(0.45, '#5a7059');
+  mGrad.addColorStop(1,    '#4a6741');
+  ctx.fillStyle = mGrad;
+  ctx.fill();
+  ctx.strokeStyle = '#2d3748';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Snow cap
+  ctx.beginPath();
+  ctx.moveTo(378, 44);
+  ctx.lineTo(312, 148);
+  ctx.lineTo(444, 148);
+  ctx.closePath();
+  ctx.fillStyle = '#eef6ff';
+  ctx.fill();
+  ctx.strokeStyle = '#c5dcf5';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Trees (right slope, decorative)
+  TREES.forEach(([tx, ty]) => {
+    ctx.beginPath();
+    ctx.moveTo(tx, ty);
+    ctx.lineTo(tx - 11, ty + 22);
+    ctx.lineTo(tx + 11, ty + 22);
+    ctx.closePath();
+    ctx.fillStyle = '#2d5a1b';
+    ctx.fill();
+  });
+
+  // Climbing path (dashed golden line)
+  ctx.setLineDash([6, 9]);
+  ctx.strokeStyle = 'rgba(251,191,36,0.65)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  PATH.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Checkpoint circles
+  PATH.forEach((p, i) => {
+    const reached = i <= climberPos;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 9, 0, Math.PI * 2);
+    ctx.fillStyle   = reached ? '#fbbf24' : 'rgba(180,180,180,0.55)';
+    ctx.strokeStyle = reached ? '#f59e0b' : '#999';
+    ctx.lineWidth   = 2;
+    ctx.fill();
+    ctx.stroke();
+  });
+
+  // Summit flag
+  ctx.font = '20px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🚩', PATH[5].x + 10, PATH[5].y - 18);
+
+  // Climber emoji (animated position)
+  ctx.font = '26px serif';
+  ctx.fillText('🧗', animX, animY - 2);
+}
+
+// Smooth animation loop
+function tick() {
+  const target = PATH[animTargetIdx];
+  const dx = target.x - animX, dy = target.y - animY;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist > 1.5) { animX += dx * 0.10; animY += dy * 0.10; }
+  else            { animX = target.x;   animY = target.y; }
+  drawScene();
+  requestAnimationFrame(tick);
+}
+
+// ── Game state ────────────────────────────────────────────────────────────────
+
+const TOTAL = 5;
+let questions   = [];
+let qIdx        = 0;
+let score       = 0;
+let timeLeft    = 30;
+let timerHandle = null;
+let answered    = false;
+let wrongCount  = 0;
+
+function buildQuestions() {
+  questions = Array.from({ length: TOTAL }, makeQuestion);
+}
+
+function updateScoreEl() {
+  document.getElementById('score-display').textContent = `⭐ Score: ${score} / ${TOTAL}`;
+}
+
+function setFeedback(text, cls) {
+  const el = document.getElementById('feedback');
+  el.textContent = text;
+  el.className = cls || '';
+}
+
+function setCheckpoint(idx) {
+  document.getElementById('checkpoint-label').textContent =
+    idx < TOTAL ? CP_NAMES[idx] + ` — Question ${idx + 1} of ${TOTAL}` : '';
+}
+
+// ── Timer ─────────────────────────────────────────────────────────────────────
+
+function startTimer() {
+  clearInterval(timerHandle);
+  timeLeft = 30;
+  refreshTimer();
+  timerHandle = setInterval(() => {
+    timeLeft--;
+    refreshTimer();
+    if (timeLeft <= 0) { clearInterval(timerHandle); onTimeout(); }
+  }, 1000);
+}
+
+function refreshTimer() {
+  const el = document.getElementById('timer');
+  el.textContent = `⏱️ ${timeLeft}s`;
+  el.className = timeLeft <= 8 ? 'urgent' : '';
+}
+
+function onTimeout() {
+  if (answered) return;
+  answered = true;
+  const q = questions[qIdx];
+  setFeedback(`⏰ Time's up! The answer was ${q.a}.`, 'timeout');
+  lockInput();
+  setTimeout(nextQ, 2400);
+}
+
+// ── Question flow ─────────────────────────────────────────────────────────────
+
+function showQuestion() {
+  answered   = false;
+  wrongCount = 0;
+  const q = questions[qIdx];
+  document.getElementById('question-text').textContent = q.q;
+  unlockInput();
+  setFeedback('');
+  setCheckpoint(qIdx);
+  startTimer();
+  document.getElementById('answer-input').focus();
+}
+
+function nextQ() {
+  qIdx++;
+  if (qIdx >= TOTAL) { endGame(); return; }
+  showQuestion();
+}
+
+function lockInput() {
+  document.getElementById('answer-input').disabled = true;
+  document.getElementById('submit-btn').disabled = true;
+}
+
+function unlockInput() {
+  const inp = document.getElementById('answer-input');
+  inp.value = '';
+  inp.disabled = false;
+  document.getElementById('submit-btn').disabled = false;
+}
+
+// ── Answer checking ───────────────────────────────────────────────────────────
+
+function submitAnswer() {
+  if (answered) return;
+  const raw = document.getElementById('answer-input').value.trim();
+  if (!raw) return;
+
+  const q = questions[qIdx];
+  const correct = numEqual(raw, q.a);
+
+  if (correct) {
+    clearInterval(timerHandle);
+    answered = true;
+    score++;
+    updateScoreEl();
+    climberPos  = Math.min(climberPos + 1, 5);
+    animTargetIdx = climberPos;
+    setFeedback('✅ Correct! Excellent work! 🌟', 'correct');
+    lockInput();
+    setTimeout(nextQ, 1900);
+  } else {
+    wrongCount++;
+    document.getElementById('answer-input').value = '';
+    document.getElementById('answer-input').focus();
+    if (wrongCount >= 2) {
+      answered = true;
+      clearInterval(timerHandle);
+      setFeedback(`❌ The answer is ${q.a}. Keep climbing! 💪`, 'wrong');
+      lockInput();
+      setTimeout(nextQ, 2400);
+    } else {
+      setFeedback('❌ Not quite — try again! You can do it! 💪', 'wrong');
+    }
+  }
+}
+
+// ── End game ──────────────────────────────────────────────────────────────────
+
+function endGame() {
+  clearInterval(timerHandle);
+  document.getElementById('cel-score').textContent =
+    `Final Score: ${score} / ${TOTAL}  ${'⭐'.repeat(score)}`;
+  let verdict;
+  if      (score === 5) verdict = '🏆 PERFECT! You conquered the mountain!';
+  else if (score >= 4)  verdict = '🏔️ Amazing! Almost perfect — keep it up!';
+  else if (score >= 3)  verdict = '⛰️ Great effort! Keep climbing!';
+  else                  verdict = '🌱 Good try! Practice makes perfect!';
+  document.getElementById('cel-verdict').textContent = verdict;
+  document.getElementById('celebration').classList.add('show');
+  launchConfetti();
+}
+
+function resetGame() {
+  document.getElementById('celebration').classList.remove('show');
+  score = 0; qIdx = 0;
+  climberPos = 0; animTargetIdx = 0;
+  animX = PATH[0].x; animY = PATH[0].y;
+  updateScoreEl();
+  buildQuestions();
+  showQuestion();
+}
+
+// ── Confetti ──────────────────────────────────────────────────────────────────
+
+function launchConfetti() {
+  const cc_canvas = document.createElement('canvas');
+  cc_canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:199';
+  document.body.appendChild(cc_canvas);
+  cc_canvas.width  = window.innerWidth;
+  cc_canvas.height = window.innerHeight;
+  const cc = cc_canvas.getContext('2d');
+  const COLORS = ['#fbbf24','#1a56db','#16a34a','#dc2626','#7c3aed','#db2777','#0891b2'];
+  const pieces = Array.from({ length: 90 }, () => ({
+    x:    Math.random() * cc_canvas.width,
+    y:    -rand(5, 30),
+    r:    rand(4, 9),
+    color: COLORS[rand(0, COLORS.length - 1)],
+    vx:   (Math.random() - 0.5) * 5,
+    vy:   rand(3, 7),
+    rot:  Math.random() * Math.PI * 2,
+    rotV: (Math.random() - 0.5) * 0.18,
+  }));
+  let frame = 0;
+  (function draw() {
+    cc.clearRect(0, 0, cc_canvas.width, cc_canvas.height);
+    pieces.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.rot += p.rotV;
+      cc.save();
+      cc.translate(p.x, p.y);
+      cc.rotate(p.rot);
+      cc.fillStyle = p.color;
+      cc.fillRect(-p.r / 2, -p.r / 2, p.r, p.r);
+      cc.restore();
+    });
+    if (++frame < 200) requestAnimationFrame(draw);
+    else cc_canvas.remove();
+  })();
+}
+
+// ── Event wiring ──────────────────────────────────────────────────────────────
+
+document.getElementById('submit-btn').addEventListener('click', submitAnswer);
+document.getElementById('answer-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitAnswer();
+});
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+
+buildQuestions();
+requestAnimationFrame(tick);
+showQuestion();
+</script>
+</body>
+</html>
