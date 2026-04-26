@@ -4,8 +4,6 @@
 
 Summit Tutor is an AI-powered math tutor for 1st and 2nd grade students at Summit Math Camp in Tegucigalpa, Honduras, built with the Claude API and Gradio. Students and parents can ask questions in English or Spanish and receive step-by-step explanations across arithmetic, fractions, subtraction with regrouping, multiplication, division, and telling time - with interactive games and adaptive worksheets powered by real Summit Math Camp curriculum materials.
 
-Summit Tutor is a bilingual (English/Spanish) AI math tutoring assistant built with the Claude API, LangChain RAG, and Gradio. It retrieves content from real Summit Math Camp teaching materials, generates interactive math games, and creates adaptive worksheets that check student answers, designed for 1st and 2nd grade students and their parents in Tegucigalpa, Honduras.
-
 ---
 
 ## What it Does
