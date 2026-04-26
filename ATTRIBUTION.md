@@ -26,7 +26,7 @@ This document describes how Anthropic's tools were used during the development o
 **Documentation**
 - Drafting `README.md`, `SETUP.md`, and this file
 
-All generated code was reviewed, tested, and modified by the team before being incorporated into the project.
+All generated code was reviewed, tested, and modified by Paola Di Bono before being incorporated into the project.
 
 ---
 
