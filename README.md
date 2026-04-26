@@ -80,8 +80,17 @@ For full setup details, see [SETUP.md](SETUP.md).
 | Guardrail accuracy | **93%** |
 | Average latency (math questions) | **5.42 s** |
 | Average response length | **585 chars** |
+| Language detection accuracy | **100%** |
+| Worksheet answer-checking accuracy | **100%** |
+| RAG retrieval relevance | **90%** |
 
 The guardrail correctly blocked 5/5 off-topic questions and allowed 9/10 math questions through (one borderline question was over-filtered), giving a 93% overall accuracy across 15 test cases.
+
+**Language detection:** Tested 5 Spanish and 5 English questions; the bot responded in the correct language 100% of the time.
+
+**Worksheet answer checking:** Tested 10 math problems with known correct answers; the Python-based checker correctly identified right and wrong answers 100% of the time. Because answers are verified programmatically rather than by Claude, there is no hallucination risk in grading.
+
+**RAG relevance:** For 10 math topic queries, retrieved documents were topically relevant in 9/10 cases (90% retrieval relevance), verified by inspecting source filenames in terminal output.
 
 ### Prompt variant comparison
 
