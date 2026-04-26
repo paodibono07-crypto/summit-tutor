@@ -13,7 +13,7 @@
 ## Step 1 — Clone the repository
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/paodibono07-crypto/summit-tutor.git
 cd summit-tutor
 ```
 
@@ -107,7 +107,7 @@ The `docs/` directory already contains sample notes. You can add, remove, or rep
 python app.py
 ```
 
-Open your browser at **http://localhost:7860**.
+Check your terminal for the local URL — it will show something like `http://127.0.0.1:7860` or a nearby port. Open that URL in your browser.
 
 ---
 
