@@ -47,6 +47,16 @@ def _practice_footer(reply: str) -> str:
         return _FOOTER_ES
     return _FOOTER_EN
 
+
+def detect_spanish(text: str) -> bool:
+    """Return True if text appears to be written in Spanish."""
+    return (
+        bool(_ES_INVERTED_RE.search(text))
+        or len(_ES_ACCENT_RE.findall(text)) >= 2
+        or len(_ES_WORD_RE.findall(text)) >= 2
+    )
+
+
 _CHECKPOINTS = [
     ("⛺", "Base Camp"),
     ("🌲", "Forest Trail"),
@@ -61,6 +71,15 @@ _WORKSHEET_SYSTEM = (
     "for 1st-2nd grade students, then provide a complete answer key. "
     "Format it nicely with a Summit Math Camp header. "
     "Do not refuse. Just generate the problems."
+)
+
+_WORKSHEET_SYSTEM_ES = (
+    "Eres un generador de hojas de trabajo para Summit Math Camp. "
+    "Genera exactamente 8 problemas de práctica de matemáticas sobre el tema dado "
+    "para estudiantes de 1er y 2do grado. ESCRIBE TODOS LOS PROBLEMAS EN ESPAÑOL. "
+    "IMPORTANTE: cada respuesta debe ser un número simple (entero, decimal, o fracción simple como '3/4'). "
+    "NO escribas palabras como 'veinte' — escribe '20'. "
+    "No te niegues. Solo genera los problemas."
 )
 
 _GAME_SYSTEM = (
@@ -212,7 +231,7 @@ def chat_with_image(
 
 # ── Pure-Python game question generator (no API call) ─────────────────────────
 
-def _py_game_questions(topic_name: str) -> list[dict]:
+def _py_game_questions(topic_name: str, lang: str = "en") -> list[dict]:
     """Return 5 {q, a} dicts generated in pure Python from the human-readable topic name."""
     print(f"[GAME] _py_game_questions: topic_name={topic_name!r}")
     ri = _random.randint
@@ -245,11 +264,18 @@ def _py_game_questions(topic_name: str) -> list[dict]:
     elif any(k in t for k in _WORD):
         def _gen():
             a = ri(5, 30); b = ri(5, 30)
-            stem = _random.choice([
-                f'There are {a} hikers at Base Camp and {b} more arrive. How many total?',
-                f'María has {a} trail snacks and finds {b} more. How many does she have?',
-                f'Carlos climbed {a} steps then {b} more. How many steps total?',
-            ])
+            if lang == "es":
+                stem = _random.choice([
+                    f'Hay {a} excursionistas en el campamento y llegan {b} más. ¿Cuántos hay en total?',
+                    f'María tiene {a} bocadillos y encuentra {b} más. ¿Cuántos tiene?',
+                    f'Carlos subió {a} escalones y luego {b} más. ¿Cuántos escalones subió en total?',
+                ])
+            else:
+                stem = _random.choice([
+                    f'There are {a} hikers at Base Camp and {b} more arrive. How many total?',
+                    f'María has {a} trail snacks and finds {b} more. How many does she have?',
+                    f'Carlos climbed {a} steps then {b} more. How many steps total?',
+                ])
             return {'q': stem, 'a': a + b}
     elif any(k in t for k in _MUL) or _mul_op:
         def _gen():
@@ -501,20 +527,33 @@ def game_turn(student_answer: str, game_state: dict) -> tuple[str, dict]:
 
 # ── Worksheet helpers ─────────────────────────────────────────────────────────
 
-def _generate_worksheet_problems(topic: str) -> tuple[list[str], list[str]]:
-    prompt = (
-        f"Topic: {topic}\n\n"
-        "Generate exactly 8 math problems for 1st-2nd grade students, progressively harder. "
-        "IMPORTANT: every answer must be a plain number (integer, decimal, or simple fraction like '3/4'). "
-        "Do NOT write words like 'twenty' — write '20'. "
-        "Return ONLY a valid JSON object — no markdown, no explanation:\n"
-        '{"problems":["full problem text without the answer","..."],"answers":["numeric answer only","..."]}'
-    )
+def _generate_worksheet_problems(topic: str, lang: str = "en") -> tuple[list[str], list[str]]:
+    if lang == "es":
+        system = _WORKSHEET_SYSTEM_ES
+        prompt = (
+            f"Tema: {topic}\n\n"
+            "Genera exactamente 8 problemas de matemáticas para estudiantes de 1er y 2do grado, "
+            "progresivamente más difíciles. ESCRIBE TODO EN ESPAÑOL. "
+            "IMPORTANTE: cada respuesta debe ser un número simple (entero, decimal, o fracción simple como '3/4'). "
+            "NO escribas palabras como 'veinte' — escribe '20'. "
+            "Devuelve SOLO un objeto JSON válido — sin markdown, sin explicación:\n"
+            '{"problems":["texto completo del problema sin la respuesta","..."],"answers":["solo la respuesta numérica","..."]}'
+        )
+    else:
+        system = _WORKSHEET_SYSTEM
+        prompt = (
+            f"Topic: {topic}\n\n"
+            "Generate exactly 8 math problems for 1st-2nd grade students, progressively harder. "
+            "IMPORTANT: every answer must be a plain number (integer, decimal, or simple fraction like '3/4'). "
+            "Do NOT write words like 'twenty' — write '20'. "
+            "Return ONLY a valid JSON object — no markdown, no explanation:\n"
+            '{"problems":["full problem text without the answer","..."],"answers":["numeric answer only","..."]}'
+        )
     try:
         response = _get_client().messages.create(
             model=MODEL,
             max_tokens=900,
-            system=_WORKSHEET_SYSTEM,
+            system=system,
             messages=[{"role": "user", "content": prompt}],
         )
         raw = response.content[0].text.strip()
@@ -552,49 +591,93 @@ def _explain_answer(problem: str, answer: str) -> str:
         return f"The answer is {answer}. Keep practicing!"
 
 
+# Bilingual string table for worksheet messages
+_WS_T: dict[str, dict[str, str]] = {
+    "header":       {"en": "📄 **SUMMIT MATH CAMP — Practice Worksheet**",     "es": "📄 **SUMMIT MATH CAMP — Hoja de Práctica**"},
+    "topic_label":  {"en": "Topic",                                             "es": "Tema"},
+    "instructions": {"en": "Answer each problem one at a time. Take your time! 🏔️", "es": "Responde cada problema uno a la vez. ¡Tómate tu tiempo! 🏔️"},
+    "problem":      {"en": "**Problem {n} of 8:**",                            "es": "**Problema {n} de 8:**"},
+    "try_again":    {"en": "**Problem {n} of 8 (try again):**",                "es": "**Problema {n} de 8 (intenta de nuevo):**"},
+    "correct":      {"en": "✅ Correct! **{a}** — Well done! 🌟",              "es": "✅ ¡Correcto! **{a}** — ¡Bien hecho! 🌟"},
+    "correct_last": {"en": "✅ Correct! **{a}** — Fantastic! 🌟",              "es": "✅ ¡Correcto! **{a}** — ¡Fantástico! 🌟"},
+    "wrong":        {"en": "Not quite! Don't give up — you can do it! 💪",    "es": "¡No fue correcto! ¡No te rindas — puedes hacerlo! 💪"},
+    "revealed":     {"en": "The answer is **{a}**.",                           "es": "La respuesta es **{a}**."},
+    "complete":     {"en": "🏔️ **Worksheet Complete!**",                      "es": "🏔️ **¡Hoja de trabajo completa!**"},
+    "score":        {"en": "**Score: {s}/8**",                                 "es": "**Puntaje: {s}/8**"},
+    "review":       {"en": "**Review these:**",                                "es": "**Repasa estos:**"},
+    "closing":      {"en": "Say **activity** for a game or **worksheet** to practice again!", "es": "Di **actividad** para un juego o **hoja de trabajo** para practicar de nuevo."},
+    "tip":          {"en": "💡 Tip: Type **exit** or **salir** at any time to stop and ask a new math question!", "es": "💡 Consejo: Escribe **salir** o **exit** en cualquier momento para parar y hacer una nueva pregunta."},
+}
+
+_WS_VERDICTS = {
+    "en": [
+        "🏆 PERFECT SCORE! You're a Summit Math champion!",
+        "🏔️ Amazing work! You're nearly at the summit!",
+        "⛰️ Great effort! Keep climbing — you're improving!",
+        "🌱 Good try! Every problem you practice makes you stronger!",
+    ],
+    "es": [
+        "🏆 ¡PUNTAJE PERFECTO! ¡Eres un campeón de Summit Math!",
+        "🏔️ ¡Trabajo increíble! ¡Casi llegas a la cima!",
+        "⛰️ ¡Gran esfuerzo! ¡Sigue subiendo — estás mejorando!",
+        "🌱 ¡Buen intento! ¡Cada problema que practicas te hace más fuerte!",
+    ],
+}
+
+
+def _t(key: str, lang: str, **kwargs) -> str:
+    """Look up a worksheet translation and format it."""
+    s = _WS_T[key].get(lang, _WS_T[key]["en"])
+    return s.format(**kwargs) if kwargs else s
+
+
 def _ws_progress(results: list) -> str:
     icons = {"correct": "✅", "revealed": "❌", None: "⬜"}
     return "  " + " ".join(icons[r] for r in results)
 
 
 def _ws_finale(ws: dict) -> str:
-    score = ws["score"]
+    score   = ws["score"]
     results = ws["results"]
     problems = ws["problems"]
-    answers = ws["answers"]
+    answers  = ws["answers"]
+    lang     = ws.get("lang", "en")
 
+    verdicts = _WS_VERDICTS[lang]
     if score == 8:
-        verdict = "🏆 PERFECT SCORE! You're a Summit Math champion!"
+        verdict = verdicts[0]
     elif score >= 6:
-        verdict = "🏔️ Amazing work! You're nearly at the summit!"
+        verdict = verdicts[1]
     elif score >= 4:
-        verdict = "⛰️ Great effort! Keep climbing — you're improving!"
+        verdict = verdicts[2]
     else:
-        verdict = "🌱 Good try! Every problem you practice makes you stronger!"
+        verdict = verdicts[3]
 
+    prob_label = "Problem" if lang == "en" else "Problema"
     missed_lines = [
-        f"  • Problem {i + 1}: {problems[i]}  →  **{answers[i]}**"
+        f"  • {prob_label} {i + 1}: {problems[i]}  →  **{answers[i]}**"
         for i, r in enumerate(results) if r == "revealed"
     ]
 
     out = (
-        f"🏔️ **Worksheet Complete!**\n\n"
-        f"**Score: {score}/8**\n{verdict}\n\n"
+        f"{_t('complete', lang)}\n\n"
+        f"{_t('score', lang, s=score)}\n{verdict}\n\n"
         f"{_ws_progress(results)}\n"
     )
     if missed_lines:
-        out += "\n**Review these:**\n" + "\n".join(missed_lines) + "\n"
-    out += "\n---\nSay **activity** for a game or **worksheet** to practice again!"
+        out += f"\n{_t('review', lang)}\n" + "\n".join(missed_lines) + "\n"
+    out += f"\n---\n{_t('closing', lang)}"
     return out
 
 
-def start_worksheet(topic: str) -> tuple[str, dict]:
+def start_worksheet(topic: str, lang: str = "en") -> tuple[str, dict]:
     """Generate 8 problems (no answers shown) and return the opening message + worksheet_state."""
-    problems, answers = _generate_worksheet_problems(topic)
+    problems, answers = _generate_worksheet_problems(topic, lang)
     ws = {
         "mode": "worksheet",
         "is_active": True,
         "topic": topic,
+        "lang": lang,
         "problems": problems,
         "answers": answers,
         "current_problem": 0,
@@ -603,23 +686,24 @@ def start_worksheet(topic: str) -> tuple[str, dict]:
         "score": 0,
     }
     msg = (
-        f"📄 **SUMMIT MATH CAMP — Practice Worksheet**\n"
-        f"Topic: **{topic}**\n\n"
+        f"{_t('header', lang)}\n"
+        f"{_t('topic_label', lang)}: **{topic}**\n\n"
         f"{_ws_progress(ws['results'])}\n\n"
-        f"Answer each problem one at a time. Take your time! 🏔️\n\n"
+        f"{_t('instructions', lang)}\n\n"
         f"---\n"
-        f"**Problem 1 of 8:**\n{problems[0]}\n\n"
-        f"💡 Tip: Type **exit** or **salir** at any time to stop and ask a new math question!"
+        f"{_t('problem', lang, n=1)}\n{problems[0]}\n\n"
+        f"{_t('tip', lang)}"
     )
     return msg, ws
 
 
 def worksheet_turn(student_answer: str, ws: dict) -> tuple[str, dict]:
     """Evaluate one worksheet answer and return (reply_message, updated_worksheet_state)."""
-    idx = ws["current_problem"]
-    problem = ws["problems"][idx]
-    answer = ws["answers"][idx]
+    idx      = ws["current_problem"]
+    problem  = ws["problems"][idx]
+    answer   = ws["answers"][idx]
     attempts = ws["wrong_attempts"].get(idx, 0)
+    lang     = ws.get("lang", "en")
 
     correct = _check_answer_numerically(student_answer, answer)
 
@@ -630,14 +714,14 @@ def worksheet_turn(student_answer: str, ws: dict) -> tuple[str, dict]:
 
         if next_idx == 8:
             ws["is_active"] = False
-            return f"✅ Correct! **{answer}** — Fantastic! 🌟\n\n" + _ws_finale(ws), ws
+            return _t("correct_last", lang, a=answer) + "\n\n" + _ws_finale(ws), ws
 
         ws["current_problem"] = next_idx
         msg = (
-            f"✅ Correct! **{answer}** — Well done! 🌟\n\n"
+            f"{_t('correct', lang, a=answer)}\n\n"
             f"{_ws_progress(ws['results'])}\n\n"
             f"---\n"
-            f"**Problem {next_idx + 1} of 8:**\n{ws['problems'][next_idx]}"
+            f"{_t('problem', lang, n=next_idx + 1)}\n{ws['problems'][next_idx]}"
         )
         return msg, ws
 
@@ -645,9 +729,9 @@ def worksheet_turn(student_answer: str, ws: dict) -> tuple[str, dict]:
     if attempts == 0:
         ws["wrong_attempts"][idx] = 1
         msg = (
-            f"Not quite! Don't give up — you can do it! 💪\n\n"
+            f"{_t('wrong', lang)}\n\n"
             f"{_ws_progress(ws['results'])}\n\n"
-            f"**Problem {idx + 1} of 8 (try again):**\n{problem}"
+            f"{_t('try_again', lang, n=idx + 1)}\n{problem}"
         )
         return msg, ws
 
@@ -656,7 +740,7 @@ def worksheet_turn(student_answer: str, ws: dict) -> tuple[str, dict]:
     ws["results"][idx] = "revealed"
     next_idx = idx + 1
 
-    reveal = f"The answer is **{answer}**.\n\n💡 {explanation}\n\n"
+    reveal = f"{_t('revealed', lang, a=answer)}\n\n💡 {explanation}\n\n"
 
     if next_idx == 8:
         ws["is_active"] = False
@@ -667,6 +751,6 @@ def worksheet_turn(student_answer: str, ws: dict) -> tuple[str, dict]:
         reveal
         + f"{_ws_progress(ws['results'])}\n\n"
         + f"---\n"
-        + f"**Problem {next_idx + 1} of 8:**\n{ws['problems'][next_idx]}"
+        + f"{_t('problem', lang, n=next_idx + 1)}\n{ws['problems'][next_idx]}"
     )
     return msg, ws

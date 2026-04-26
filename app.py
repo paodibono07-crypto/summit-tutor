@@ -6,7 +6,7 @@ from collections import defaultdict
 
 import gradio as gr
 
-from chat import chat, chat_with_image, start_worksheet, worksheet_turn, _py_game_questions
+from chat import chat, chat_with_image, start_worksheet, worksheet_turn, _py_game_questions, detect_spanish
 from guardrails import is_on_topic, off_topic_reply
 from logger import log_interaction
 from resource_index import get_topic_name, find_resources
@@ -175,6 +175,14 @@ def _is_worksheet(msg: str) -> bool: return _fuzzy(msg, _WORKSHEET_TRIGGERS)
 def _is_exit(msg: str)      -> bool: return _fuzzy(msg, _EXIT_TRIGGERS, cutoff=0.85)
 
 
+def _session_lang(claude_history: list[dict]) -> str:
+    """Return 'es' if the most recent user message in history is Spanish, else 'en'."""
+    for msg in reversed(claude_history):
+        if msg.get("role") == "user" and isinstance(msg.get("content"), str):
+            return "es" if detect_spanish(msg["content"]) else "en"
+    return "en"
+
+
 _GAME_TEMPLATE = """\
 <!DOCTYPE html><html><head><meta charset="UTF-8"><style>
 *{{box-sizing:border-box;margin:0;padding:0}}
@@ -283,9 +291,9 @@ mv(0);showQ();
 </script></body></html>"""
 
 
-def _build_inline_game(topic_name: str) -> str:
+def _build_inline_game(topic_name: str, lang: str = "en") -> str:
     """Return a gr.HTML value: a self-contained iframe embedding the full game."""
-    questions = _py_game_questions(topic_name)
+    questions = _py_game_questions(topic_name, lang)
     game_html = (
         _GAME_TEMPLATE
         .replace("__TOPIC_NAME__", topic_name)
@@ -354,17 +362,26 @@ def respond(
         reply, worksheet_state = worksheet_turn(message, worksheet_state)
     elif _is_activity(message):
         topic = last_topic or "general math"
-        print(f"[GAME] Activity triggered — last_topic_state={last_topic!r}, using topic={topic!r}")
-        reply = (
-            f"🏔️ **Summit Mountain Climber** — Topic: **{topic}**\n\n"
-            f"The game is loading below! Answer 5 questions to reach the summit! ⛰️\n\n"
-            f"💡 Tip: Type **exit** or **salir** at any time to stop and ask a new math question!"
-        )
-        panel_update = gr.update(value=_build_inline_game(topic))
+        lang  = _session_lang(claude_history)
+        print(f"[GAME] Activity triggered — last_topic_state={last_topic!r}, using topic={topic!r}, lang={lang!r}")
+        if lang == "es":
+            reply = (
+                f"🏔️ **Summit Mountain Climber** — Tema: **{topic}**\n\n"
+                f"¡El juego se está cargando abajo! Responde 5 preguntas para llegar a la cima. ⛰️\n\n"
+                f"💡 Consejo: Escribe **salir** o **exit** en cualquier momento para parar."
+            )
+        else:
+            reply = (
+                f"🏔️ **Summit Mountain Climber** — Topic: **{topic}**\n\n"
+                f"The game is loading below! Answer 5 questions to reach the summit! ⛰️\n\n"
+                f"💡 Tip: Type **exit** or **salir** at any time to stop and ask a new math question!"
+            )
+        panel_update = gr.update(value=_build_inline_game(topic, lang))
         new_game_active = True
     elif _is_worksheet(message):
         topic = last_topic or "general math"
-        reply, worksheet_state = start_worksheet(topic)
+        lang  = _session_lang(claude_history)
+        reply, worksheet_state = start_worksheet(topic, lang)
     elif not is_on_topic(message):
         reply = off_topic_reply(message)
     else:
@@ -433,6 +450,30 @@ with gr.Blocks(title=TITLE, theme=gr.themes.Soft(primary_hue="blue"), css=CSS) a
         <div class="parent-box">
             🎒 <strong>For Parents:</strong> Use this after camp to keep practicing with
             your child! Ask about the same topics from Summit Math Camp.
+        </div>
+        <div class="parent-box">
+            🎒 <strong>Para Padres:</strong> ¡Usa esto después del campamento para seguir
+            practicando con tu hijo o hija! Pregunta sobre los mismos temas del Summit Math Camp.
+        </div>
+    """)
+
+    gr.HTML("""
+        <div style="background-color:#dbeafe;border-left:5px solid #3b9edd;border-radius:8px;
+                    padding:14px 18px;margin-bottom:14px;color:#0a1f44;font-size:0.93em;line-height:1.7;">
+            📚 <strong>Available Topics (1st &amp; 2nd Grade):</strong>
+            Even &amp; Odd Numbers, Place Values, Basic Addition &amp; Subtraction,
+            2-Digit Addition, Subtraction with Regrouping, Word Problems, Patterns,
+            Telling Time, Multiplication Tables, Introduction to Fractions,
+            Simplifying Fractions, and Introduction to Division.<br>
+            📚 <strong>Temas Disponibles (1° y 2° Grado):</strong>
+            Números pares e impares, Valores posicionales, Suma y resta básica,
+            Suma de 2 dígitos, Resta con reagrupamiento, Problemas de palabras,
+            Patrones, El reloj, Tablas de multiplicar, Introducción a fracciones,
+            Simplificación de fracciones, e Introducción a la división.<br>
+            🚀 <strong>Coming soon:</strong> 3rd–5th grade topics, more activities,
+            and the full Summit digital platform! &nbsp;/&nbsp;
+            <strong>Próximamente:</strong> temas de 3° a 5° grado, más actividades,
+            ¡y la plataforma digital completa de Summit!
         </div>
     """)
 
