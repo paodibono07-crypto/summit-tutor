@@ -355,7 +355,11 @@ def respond(
     elif _is_activity(message):
         topic = last_topic or "general math"
         print(f"[GAME] Activity triggered — last_topic_state={last_topic!r}, using topic={topic!r}")
-        reply = f"🏔️ **Summit Mountain Climber** — Topic: **{topic}**\n\nThe game is loading below! Answer 5 questions to reach the summit! ⛰️"
+        reply = (
+            f"🏔️ **Summit Mountain Climber** — Topic: **{topic}**\n\n"
+            f"The game is loading below! Answer 5 questions to reach the summit! ⛰️\n\n"
+            f"💡 Tip: Type **exit** or **salir** at any time to stop and ask a new math question!"
+        )
         panel_update = gr.update(value=_build_inline_game(topic))
         new_game_active = True
     elif _is_worksheet(message):

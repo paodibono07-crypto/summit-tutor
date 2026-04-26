@@ -608,7 +608,8 @@ def start_worksheet(topic: str) -> tuple[str, dict]:
         f"{_ws_progress(ws['results'])}\n\n"
         f"Answer each problem one at a time. Take your time! 🏔️\n\n"
         f"---\n"
-        f"**Problem 1 of 8:**\n{problems[0]}"
+        f"**Problem 1 of 8:**\n{problems[0]}\n\n"
+        f"💡 Tip: Type **exit** or **salir** at any time to stop and ask a new math question!"
     )
     return msg, ws
 
