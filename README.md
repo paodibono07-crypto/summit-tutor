@@ -45,7 +45,7 @@ cp your-notes.pdf docs/
 python app.py
 ```
 
-The Gradio interface opens at `http://localhost:7860`.
+The Gradio interface will open automatically. Check your terminal for the local URL — it will show something like `http://127.0.0.1:7860` or a nearby port number.
 
 For full setup details, see [SETUP.md](SETUP.md).
 
