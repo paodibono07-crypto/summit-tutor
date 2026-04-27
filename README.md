@@ -51,10 +51,7 @@ pip install -r requirements.txt
 # 4. Set your API key
 export ANTHROPIC_API_KEY=sk-ant-...
 
-# 5. (Optional) add course-note PDFs for the RAG pipeline
-cp your-notes.pdf docs/
-
-# 6. Launch the app
+# 5. Launch the app
 python app.py
 ```
 

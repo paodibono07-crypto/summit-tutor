@@ -88,9 +88,9 @@ export $(cat .env | xargs)   # macOS / Linux
 
 ---
 
-## Step 5 — (Optional) Add course-note PDFs for the RAG pipeline
+## Step 5 — Summit Math Camp curriculum is pre-loaded
 
-The `docs/` folder already contains 14 Summit Math Camp curriculum PDFs that power the RAG pipeline. No additional files needed. If you want to add your own PDFs, place them in the `docs/` folder and they will be automatically indexed on startup.
+The `docs/` folder already contains 14 Summit Math Camp curriculum PDFs — no action needed. If you want to add your own PDFs, place them in the `docs/` folder and they will be automatically indexed on startup.
 
 ---
 
