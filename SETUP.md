@@ -90,14 +90,7 @@ export $(cat .env | xargs)   # macOS / Linux
 
 ## Step 5 — (Optional) Add course-note PDFs for the RAG pipeline
 
-Place PDF files in the `docs/` directory. Summit Tutor will automatically index them on startup and use them to ground answers in your curriculum.
-
-```bash
-cp algebra_notes.pdf docs/
-cp geometry_notes.pdf docs/
-```
-
-The `docs/` directory already contains sample notes. You can add, remove, or replace any PDFs — the index rebuilds automatically.
+The `docs/` folder already contains 14 Summit Math Camp curriculum PDFs that power the RAG pipeline. No additional files needed. If you want to add your own PDFs, place them in the `docs/` folder and they will be automatically indexed on startup.
 
 ---
 
