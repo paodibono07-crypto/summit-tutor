@@ -175,11 +175,28 @@ def _is_worksheet(msg: str) -> bool: return _fuzzy(msg, _WORKSHEET_TRIGGERS)
 def _is_exit(msg: str)      -> bool: return _fuzzy(msg, _EXIT_TRIGGERS, cutoff=0.85)
 
 
-def _session_lang(claude_history: list[dict]) -> str:
-    """Return 'es' if the most recent user message in history is Spanish, else 'en'."""
-    for msg in reversed(claude_history):
-        if msg.get("role") == "user" and isinstance(msg.get("content"), str):
-            return "es" if detect_spanish(msg["content"]) else "en"
+# Spanish-only subsets of the trigger lists — used to detect language from the trigger word itself
+_ACTIVITY_TRIGGERS_ES  = {"actividad", "actívidad", "activdad", "actividades",
+                           "juego", "jugar", "juego de matematicas", "juego de matemáticas"}
+_WORKSHEET_TRIGGERS_ES = {"hoja", "hoja de trabajo", "practica", "práctica",
+                           "hoja de practica", "hoja de práctica",
+                           "ejercicios", "ejercicio", "practicar"}
+
+
+def _trigger_lang(message: str, es_triggers: set) -> str:
+    """Return 'es' if the message matches a known Spanish trigger, else 'en'.
+
+    Checks the trigger word itself rather than semantic Spanish detection, because
+    short words like 'actividad' or 'hoja' don't carry enough accent/word signals
+    for the general detect_spanish() heuristic to work reliably.
+    """
+    clean = message.strip().lower()
+    # Direct membership check
+    if clean in es_triggers:
+        return "es"
+    # Fuzzy match against the Spanish set
+    if difflib.get_close_matches(clean, list(es_triggers), n=1, cutoff=0.80):
+        return "es"
     return "en"
 
 
@@ -422,7 +439,7 @@ def respond(
         reply, worksheet_state = worksheet_turn(message, worksheet_state)
     elif _is_activity(message):
         topic = last_topic or "general math"
-        lang  = _session_lang(claude_history)
+        lang  = _trigger_lang(message, _ACTIVITY_TRIGGERS_ES)
         print(f"[GAME] Activity triggered — last_topic_state={last_topic!r}, using topic={topic!r}, lang={lang!r}")
         if lang == "es":
             reply = (
@@ -440,7 +457,7 @@ def respond(
         new_game_active = True
     elif _is_worksheet(message):
         topic = last_topic or "general math"
-        lang  = _session_lang(claude_history)
+        lang  = _trigger_lang(message, _WORKSHEET_TRIGGERS_ES)
         reply, worksheet_state = start_worksheet(topic, lang)
     elif not is_on_topic(message):
         reply = off_topic_reply(message)

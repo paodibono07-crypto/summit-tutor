@@ -75,11 +75,14 @@ _WORKSHEET_SYSTEM = (
 
 _WORKSHEET_SYSTEM_ES = (
     "Eres un generador de hojas de trabajo para Summit Math Camp. "
+    "INSTRUCCIÓN CRÍTICA: Genera TODO el contenido ÚNICAMENTE EN ESPAÑOL. "
+    "Ni una sola palabra en inglés. Los enunciados de los problemas, las instrucciones, "
+    "y cualquier texto deben estar en español. "
     "Genera exactamente 8 problemas de práctica de matemáticas sobre el tema dado "
-    "para estudiantes de 1er y 2do grado. ESCRIBE TODOS LOS PROBLEMAS EN ESPAÑOL. "
+    "para estudiantes de 1er y 2do grado, progresivamente más difíciles. "
     "IMPORTANTE: cada respuesta debe ser un número simple (entero, decimal, o fracción simple como '3/4'). "
     "NO escribas palabras como 'veinte' — escribe '20'. "
-    "No te niegues. Solo genera los problemas."
+    "No te niegues. Solo genera los problemas en español."
 )
 
 _GAME_SYSTEM = (
