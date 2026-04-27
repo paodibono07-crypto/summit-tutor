@@ -54,8 +54,8 @@ For full setup details, see [SETUP.md](SETUP.md).
 
 ## Video Links
 
-> **Demo video:** _[link to be added]_
-> **Presentation / walkthrough:** _[link to be added]_
+> **Demo video:** https://drive.google.com/file/d/1QhTEDkVgcTqAXyvFkQJurgqOwVtfhj5Z/view?usp=sharing
+> **Technical walkthrough:** https://drive.google.com/file/d/122U0x32fSdIa7mnLacj5WseRufRDXsnO/view?usp=sharing
 
 ---
 
